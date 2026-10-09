@@ -1,6 +1,8 @@
+
 import streamlit as st
 import json
 import os
+import time
 from google import genai
 
 st.set_page_config(
@@ -187,23 +189,30 @@ elif menu == "🤖 Rai - AI Copilot":
         
         # Real AI Processing with Gemini
         if api_key:
-            try:
-                client = genai.Client(api_key=api_key)
-                
-                system_instruction = (
-                    "You are Rai, a high-end personal AI copilot built by a brilliant 14-year-old aspiring MIT astrophysics student. "
-                    "You are cool, casual, highly encouraging, and super intelligent. Speak in simple, clear English with emojis. "
-                    "You excel at explaining Python coding, solving physics/math problems step-by-step, and giving MIT roadmap advice. "
-                    "Never repeat generic boilerplate text; give fully custom, detailed, and direct answers to every prompt."
-                )
-                
-                response_obj = client.models.generate_content(
-                    model="gemini-3.8-flash",
-                    contents=f"{system_instruction}\n\nUser Question: {user_prompt}"
-                )
-                response = response_obj.text
-            except Exception as e:
-                response = f"⚠️ **Rai Connection Alert**: Couldn't reach my AI brain! Double-check your API key in Render settings. (Error: {str(e)})"
+            client = genai.Client(api_key=api_key)
+            system_instruction = (
+                "You are Rai, a high-end personal AI copilot built by a brilliant 14-year-old aspiring MIT astrophysics student. "
+                "You are cool, casual, highly encouraging, and super intelligent. Speak in simple, clear English with emojis. "
+                "You excel at explaining Python coding, solving physics/math problems step-by-step, and giving MIT roadmap advice. "
+                "Never repeat generic boilerplate text; give fully custom, detailed, and direct answers to every prompt."
+            )
+            
+            # Automatic retry loop for temporary 503 capacity spikes
+            response = None
+            max_attempts = 3
+            for attempt in range(max_attempts):
+                try:
+                    response_obj = client.models.generate_content(
+                        model="gemini-3.8-flash",
+                        contents=f"{system_instruction}\n\nUser Question: {user_prompt}"
+                    )
+                    response = response_obj.text
+                    break
+                except Exception as e:
+                    if "503" in str(e) and attempt < max_attempts - 1:
+                        time.sleep(2)  # Wait 2 seconds and retry automatically
+                        continue
+                    response = f"⚠️ **Rai Connection Alert**: Google servers are experiencing heavy traffic right now. Give it a few seconds and try again! (Error: {str(e)})"
         else:
             response = "🔑 **Rai System Note**: Please add GEMINI_API_KEY in Render Environment Variables to unlock full AI power! 🔥"
             
