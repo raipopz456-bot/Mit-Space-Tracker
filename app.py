@@ -1,4 +1,3 @@
-
 import streamlit as st
 import json
 import os
@@ -168,8 +167,17 @@ if menu == "🎯 Roadmap Tracker":
 
 # 2. RAI - PERSONAL AI COPILOT
 elif menu == "🤖 Rai - AI Copilot":
-    st.header("🤖 Rai — High-End Personal AI Copilot")
-    st.caption("⚡ Powered by Gemini AI | Super Cool, Interactive & Unstoppable Brain!")
+    col_title, col_btn = st.columns([4, 1])
+    with col_title:
+        st.header("🤖 Rai — High-End Personal AI Copilot")
+        st.caption("⚡ Powered by Gemini AI | Super Cool, Interactive & Unstoppable Brain!")
+    with col_btn:
+        if st.button("🗑️ Clear Memory"):
+            data["chat_history"] = [
+                {"role": "assistant", "content": "Yo bro! 😎 Memory reset complete. What new topic are we exploring today?"}
+            ]
+            save_data(data)
+            st.rerun()
     
     if not api_key:
         st.warning("⚠️ GEMINI_API_KEY environment variable not found in Render settings!")
@@ -187,7 +195,7 @@ elif menu == "🤖 Rai - AI Copilot":
             st.markdown(user_prompt)
         data["chat_history"].append({"role": "user", "content": user_prompt})
         
-        # Real AI Processing with Gemini
+        # Real AI Processing with Gemini + Persistent Memory Context
         if api_key:
             client = genai.Client(api_key=api_key)
             system_instruction = (
@@ -197,6 +205,21 @@ elif menu == "🤖 Rai - AI Copilot":
                 "Never repeat generic boilerplate text; give fully custom, detailed, and direct answers to every prompt."
             )
             
+            # Construct context from up to the last 10 historical conversation turns
+            history_context = ""
+            recent_turns = data["chat_history"][:-1][-10:]  # Exclude current prompt, take last 10 messages
+            for msg in recent_turns:
+                sender = "User" if msg["role"] == "user" else "Rai"
+                history_context += f"{sender}: {msg['content']}\n"
+            
+            full_prompt = (
+                f"{system_instruction}\n\n"
+                f"--- CONVERSATION MEMORY ---\n"
+                f"{history_context}"
+                f"--- CURRENT QUESTION ---\n"
+                f"User Question: {user_prompt}"
+            )
+            
             # Automatic retry loop for temporary 503 capacity spikes
             response = None
             max_attempts = 3
@@ -204,13 +227,13 @@ elif menu == "🤖 Rai - AI Copilot":
                 try:
                     response_obj = client.models.generate_content(
                         model="gemini-3.8-flash",
-                        contents=f"{system_instruction}\n\nUser Question: {user_prompt}"
+                        contents=full_prompt
                     )
                     response = response_obj.text
                     break
                 except Exception as e:
                     if "503" in str(e) and attempt < max_attempts - 1:
-                        time.sleep(2)  # Wait 2 seconds and retry automatically
+                        time.sleep(2)
                         continue
                     response = f"⚠️ **Rai Connection Alert**: Google servers are experiencing heavy traffic right now. Give it a few seconds and try again! (Error: {str(e)})"
         else:
