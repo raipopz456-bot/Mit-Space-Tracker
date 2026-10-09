@@ -198,7 +198,7 @@ elif menu == "🤖 Rai - AI Copilot":
                 )
                 
                 response_obj = client.models.generate_content(
-                    model="gemini-1.5-flash",
+                    model="gemini-2.5-flash",
                     contents=f"{system_instruction}\n\nUser Question: {user_prompt}"
                 )
                 response = response_obj.text
