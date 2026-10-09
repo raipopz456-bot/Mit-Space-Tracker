@@ -207,8 +207,8 @@ elif menu == "🤖 Rai - AI Copilot":
         
         if groq_key:
             client = Groq(api_key=groq_key)
-            # List of active Groq model names to cycle through automatically
-            candidate_models = ["llama3-8b-8192", "llama3-70b-8192", "mixtral-8x7b-32768", "gemma2-9b-it"]
+            # Active models on Groq
+            candidate_models = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"]
             
             last_err = ""
             for target_model in candidate_models:
@@ -274,4 +274,5 @@ elif menu == "💡 Space Vision & Idea Board":
     st.subheader("Your Brainstorm Log")
     for idx, idea in enumerate(data["ideas"]):
         st.info(f"**Idea #{idx+1}:** {idea}")
+
    
