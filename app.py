@@ -35,10 +35,10 @@ st.markdown("""
         animation: rocketLaunch 1.2s ease-out;
     }
 
-    .mit-logo {
-        width: 150px;
+    .mit-logo-svg {
+        width: 140px;
         margin-bottom: 15px;
-        filter: drop-shadow(0px 0px 15px rgba(255, 255, 255, 0.8));
+        filter: drop-shadow(0px 0px 12px rgba(163, 31, 52, 0.9));
     }
 
     .main-title {
@@ -69,10 +69,12 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Header Section with Official MIT Logo & Title
+# Header Section with Inline Official MIT SVG Logo & Title
 st.markdown("""
 <div class="header-container">
-    <img class="mit-logo" src="https://upload.wikimedia.org/wikipedia/commons/0/0c/MIT_logo_2003-2023.svg" alt="MIT Emblem">
+    <svg class="mit-logo-svg" viewBox="0 0 321 166" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0 166V0h33v166H0zm55 0V0h33v110H55v56zm55 0V0h33v166h-33zm55 0V56h33v110h-33zm0-110V0h33v56h-33zm55 110V0h33v166h-33zm56 0V56h32v110h-32z" fill="#A31F34"/>
+    </svg>
     <h1 class="main-title">MIT SPACE SCIENTIST LAUNCHPAD</h1>
     <div class="sub-title">🚀 Your Interactive 4-Year Mission to MIT & Astrophysics</div>
 </div>
