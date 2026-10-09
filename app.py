@@ -8,7 +8,7 @@ st.set_page_config(
     layout="wide"
 )
 
-# Deep Space Canvas CSS + MIT Emblem Styling
+# Deep Space Canvas CSS + Official MIT Emblem Styling
 st.markdown("""
 <style>
     /* Deep space background */
@@ -36,9 +36,9 @@ st.markdown("""
     }
 
     .mit-logo {
-        width: 140px;
+        width: 150px;
         margin-bottom: 15px;
-        filter: drop-shadow(0px 0px 12px rgba(163, 31, 52, 0.8));
+        filter: drop-shadow(0px 0px 15px rgba(255, 255, 255, 0.8));
     }
 
     .main-title {
@@ -57,15 +57,10 @@ st.markdown("""
         margin-top: 5px;
         text-shadow: 0 0 5px rgba(255, 255, 255, 0.4);
     }
-
-    /* Translucent glass container effect for content */
-    div[data-testid="stVerticalBlock"] > div {
-        border-radius: 12px;
-    }
 </style>
 """, unsafe_allow_html=True)
 
-# Header Section with MIT Seal & Title
+# Header Section with Official MIT Logo & Title
 st.markdown("""
 <div class="header-container">
     <img class="mit-logo" src="https://upload.wikimedia.org/wikipedia/commons/0/0c/MIT_logo_2003-2023.svg" alt="MIT Emblem">
@@ -96,34 +91,39 @@ menu = st.sidebar.radio("Navigation", ["🎯 Roadmap Tracker", "🔗 Resource & 
 
 # 1. ROADMAP TRACKER
 if menu == "🎯 Roadmap Tracker":
-    st.header("🎯 4-Year Academic & Technical Roadmap")
+    st.header("🎯 Complete 4-Year Academic & Technical Roadmap")
     
     roadmap = {
         "🛠️ Year 8 (Current – Late 2026): Launching the Rocket": [
-            ("Begin Python Coding", "Start a free Python foundational course on Codecademy or Kaggle."),
-            ("Master Advanced Algebra", "Use Khan Academy to master algebra and geometry ahead of school."),
-            ("Explore Real Space Data", "Study cosmic coordinates through NASA's Hubble Site."),
-            ("MIT AI 101 Overview", "Complete free MIT AI 101 basic concepts overview.")
+            ("Begin Python Coding", "Start a free Python foundational course on Codecademy or Kaggle to analyze telescope data."),
+            ("Master Advanced Algebra", "Use Khan Academy to master algebra and geometry ahead of your school curriculum."),
+            ("Explore Real Space Data", "Study cosmic coordinates and star light tracking through NASA's Hubble Site."),
+            ("MIT AI 101 Overview", "Complete the free MIT AI 101 basic concepts overview to understand core terminology.")
         ],
         "🌌 Year 9 (2027) — Foundation & Advanced Skills": [
-            ("Master Data Science in Python", "Complete advanced programming tracks on DataCamp or Coursera."),
-            ("Academic Excellence", "Achieve a 98%+ average in school Mathematics."),
-            ("Math Olympiad Training", "Enter the Australian Mathematics Competition (AMC)."),
-            ("Free Robotic Telescopes", "Control real robotic telescopes via Harvard MicroObservatory.")
+            ("Master Data Science in Python", "Complete advanced programming tracks on DataCamp or Coursera focused on data analysis."),
+            ("Academic Excellence", "Achieve a 98%+ average in school Mathematics and secure a spot in the highest accelerated math pathway."),
+            ("Math Olympiad Training", "Enter the Australian Mathematics Competition (AMC) at school; aim for 'Prize' or 'High Distinction'."),
+            ("Free Robotic Telescopes", "Create a free account on the Harvard MicroObservatory to control real robotic telescopes online."),
+            ("Google AI Micro-Course", "Complete 'Google AI for Anyone' to understand how data models are built.")
         ],
-        "🧪 Year 10 (2028) — Competitions & Research": [
-            ("BHP Science & Engineering Awards", "Build an astronomy research project using open NASA data."),
-            ("Citizen Science Contributions", "Classify deep-space galaxies on Zooniverse Galaxy Zoo."),
-            ("Intermediate Olympiad", "Sit the Australian Intermediate Mathematics Olympiad (AIMO).")
+        "🧪 Year 10 (2028) — National Competitions & Research": [
+            ("BHP Science & Engineering Awards", "Use free NASA data to build an astronomy research project (100% free entry)."),
+            ("Citizen Science Contributions", "Join Galaxy Zoo on Zooniverse to help professional astronomers classify deep-space galaxies."),
+            ("Intermediate Olympiad", "Sit the Australian Intermediate Mathematics Olympiad (AIMO) at school."),
+            ("HSC Subject Selection", "Select top-level courses: Physics, Chemistry, Math Advanced, Math Extension 1, and Math Extension 2.")
         ],
         "📝 Year 11 (2029) — International Standards": [
-            ("Australian Physics Olympiad", "Sit the national exam at school for summer school invitation."),
-            ("SAT Preparation", "Target 1560-1600 total score (perfect 800 Math)."),
-            ("IELTS Academic Test", "Achieve an overall band score of 8.0+")
+            ("Australian Physics Olympiad (ASO)", "Sit the national exam; aim for a Gold Medal and Australian Science Olympiad Summer School invitation."),
+            ("Free SAT Preparation", "Use Khan Academy's Official SAT Prep daily. Target 1560–1600 total score (perfect 800 Math)."),
+            ("IELTS Academic Test", "Achieve an overall band score of 8.0 or 9.0 (check for fee waivers with school counsellor)."),
+            ("University Physics Outreach", "Email physics professors at local universities (e.g., UQ) for reading materials or mentorship.")
         ],
         "🎓 Year 12 (2030) — The Pinnacle": [
-            ("Perfect Australian Rank", "Graduate with an ATAR of 99.50+."),
-            ("Apply to MIT", "Submit MIT undergraduate application via admissions portal by Nov 1.")
+            ("Perfect Australian Rank", "Graduate with an ATAR of 99.50 to 99.95 using study groups and library resources."),
+            ("HSC Top Achiever", "Place on the official NSW 'Top Achievers' list for Physics or Extension Mathematics."),
+            ("Free MIT Application", "Apply to MIT via admissions portal by Nov 1, 2030 (request application fee waiver)."),
+            ("Submit CSS Profile for Financial Aid", "Provide income details so MIT applies full tuition discounts under financial aid policies.")
         ]
     }
     
