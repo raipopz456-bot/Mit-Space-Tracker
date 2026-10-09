@@ -8,34 +8,71 @@ st.set_page_config(
     layout="wide"
 )
 
-# Custom CSS for Rocket Animations and Glowing Dark Theme
+# Deep Space Canvas CSS + MIT Emblem Styling
 st.markdown("""
 <style>
+    /* Deep space background */
+    .stApp {
+        background: linear-gradient(rgba(10, 10, 26, 0.85), rgba(10, 10, 26, 0.85)), 
+                    url("https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?q=80&w=2000&auto=format&fit=crop");
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+    }
+
     @keyframes rocketLaunch {
-        0% { transform: translateY(50px); opacity: 0; }
-        50% { transform: translateY(-10px); opacity: 1; }
+        0% { transform: translateY(30px); opacity: 0; }
         100% { transform: translateY(0); opacity: 1; }
     }
-    .main-title {
+
+    .header-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
         text-align: center;
+        padding: 20px 0;
+        animation: rocketLaunch 1.2s ease-out;
+    }
+
+    .mit-logo {
+        width: 140px;
+        margin-bottom: 15px;
+        filter: drop-shadow(0px 0px 12px rgba(163, 31, 52, 0.8));
+    }
+
+    .main-title {
         color: #00d4ff;
         font-family: 'Trebuchet MS', sans-serif;
-        animation: rocketLaunch 1.5s ease-out;
-        font-size: 3em;
-        font-weight: bold;
+        font-size: 2.8em;
+        font-weight: 800;
+        letter-spacing: 2px;
+        text-shadow: 0 0 15px rgba(0, 212, 255, 0.6);
+        margin: 0;
     }
-    .rocket-icon {
-        font-size: 4em;
-        text-align: center;
-        animation: rocketLaunch 2s infinite alternate;
+
+    .sub-title {
+        color: #e0e0e0;
+        font-size: 1.1em;
+        margin-top: 5px;
+        text-shadow: 0 0 5px rgba(255, 255, 255, 0.4);
+    }
+
+    /* Translucent glass container effect for content */
+    div[data-testid="stVerticalBlock"] > div {
+        border-radius: 12px;
     }
 </style>
 """, unsafe_allow_html=True)
 
-# Animated Intro Banner
-st.markdown('<div class="rocket-icon">🚀</div>', unsafe_allow_html=True)
-st.markdown('<h1 class="main-title">MIT SPACE SCIENTIST LAUNCHPAD</h1>', unsafe_allow_html=True)
-st.caption("<p style='text-align: center;'>Your Interactive 4-Year Mission to MIT & Astrophysics</p>", unsafe_allow_html=True)
+# Header Section with MIT Seal & Title
+st.markdown("""
+<div class="header-container">
+    <img class="mit-logo" src="https://upload.wikimedia.org/wikipedia/commons/0/0c/MIT_logo_2003-2023.svg" alt="MIT Emblem">
+    <h1 class="main-title">MIT SPACE SCIENTIST LAUNCHPAD</h1>
+    <div class="sub-title">🚀 Your Interactive 4-Year Mission to MIT & Astrophysics</div>
+</div>
+""", unsafe_allow_html=True)
 
 DATA_FILE = "user_mission_data.json"
 
@@ -126,7 +163,7 @@ elif menu == "🔗 Resource & Link Manager":
     with col2:
         st.subheader("Saved Links")
         for idx, item in enumerate(data["links"]):
-            st.markdown(f"-[**{item['name']}**]({item['url']})")
+            st.markdown(f"- [**{item['name']}**]({item['url']})")
 
 # 3. VISION & IDEA BOARD
 elif menu == "💡 Space Vision & Idea Board":
