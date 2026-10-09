@@ -206,28 +206,32 @@ elif menu == "🤖 Rai - AI Copilot":
         response = None
         
         if groq_key:
-            client = Groq(api_key=groq_key)
-            # Active models on Groq
-            candidate_models = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"]
-            
-            last_err = ""
-            for target_model in candidate_models:
-                try:
-                    completion = client.chat.completions.create(
-                        model=target_model,
-                        messages=[
-                            {"role": "system", "content": system_instruction},
-                            {"role": "user", "content": f"Memory context:\n{history_context}\n\nQuestion: {user_prompt}"}
-                        ]
-                    )
-                    response = completion.choices[0].message.content
-                    break
-                except Exception as e:
-                    last_err = str(e)
-                    continue
-            
-            if not response:
-                response = f"⚠️ **Rai Connection Alert**: Couldn't reach Groq models! (Error: {last_err})"
+            try:
+                client = Groq(api_key=groq_key)
+                
+                # Query Groq to fetch currently available models automatically
+                available_models = [m.id for m in client.models.list().data if "whisper" not in m.id and "guard" not in m.id]
+                
+                last_err = ""
+                for target_model in available_models:
+                    try:
+                        completion = client.chat.completions.create(
+                            model=target_model,
+                            messages=[
+                                {"role": "system", "content": system_instruction},
+                                {"role": "user", "content": f"Memory context:\n{history_context}\n\nQuestion: {user_prompt}"}
+                            ]
+                        )
+                        response = completion.choices[0].message.content
+                        break
+                    except Exception as e:
+                        last_err = str(e)
+                        continue
+                
+                if not response:
+                    response = f"⚠️ **Rai Connection Alert**: None of the available models worked. (Error: {last_err})"
+            except Exception as e:
+                response = f"⚠️ **Rai Connection Alert**: Failed to list models from Groq. (Error: {str(e)})"
         else:
             response = "🔑 **Rai System Note**: Please add GROQ_API_KEY in Render Environment Variables to wake up Rai!"
             
