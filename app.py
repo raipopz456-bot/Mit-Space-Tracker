@@ -206,18 +206,28 @@ elif menu == "🤖 Rai - AI Copilot":
         response = None
         
         if groq_key:
-            try:
-                client = Groq(api_key=groq_key)
-                completion = client.chat.completions.create(
-                    model="llama3-8b-8192",
-                    messages=[
-                        {"role": "system", "content": system_instruction},
-                        {"role": "user", "content": f"Memory context:\n{history_context}\n\nQuestion: {user_prompt}"}
-                    ]
-                )
-                response = completion.choices[0].message.content
-            except Exception as e:
-                response = f"⚠️ **Rai Connection Alert**: Couldn't reach Groq! Check your GROQ_API_KEY in Render settings. (Error: {str(e)})"
+            client = Groq(api_key=groq_key)
+            # List of active Groq model names to cycle through automatically
+            candidate_models = ["llama3-8b-8192", "llama3-70b-8192", "mixtral-8x7b-32768", "gemma2-9b-it"]
+            
+            last_err = ""
+            for target_model in candidate_models:
+                try:
+                    completion = client.chat.completions.create(
+                        model=target_model,
+                        messages=[
+                            {"role": "system", "content": system_instruction},
+                            {"role": "user", "content": f"Memory context:\n{history_context}\n\nQuestion: {user_prompt}"}
+                        ]
+                    )
+                    response = completion.choices[0].message.content
+                    break
+                except Exception as e:
+                    last_err = str(e)
+                    continue
+            
+            if not response:
+                response = f"⚠️ **Rai Connection Alert**: Couldn't reach Groq models! (Error: {last_err})"
         else:
             response = "🔑 **Rai System Note**: Please add GROQ_API_KEY in Render Environment Variables to wake up Rai!"
             
