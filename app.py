@@ -120,7 +120,148 @@ if menu == "🎯 Roadmap Tracker":
         "🌌 Year 9 (2027) — Foundation & Advanced Skills": [
             ("Master Data Science in Python", "Complete advanced programming tracks on DataCamp or Coursera focused on data analysis."),
             ("Academic Excellence", "Achieve a 98%+ average in school Mathematics and secure a spot in the highest accelerated math pathway."),
-            ("Math Olympiad Training", "Enter the Australian Mathematics Competition (AMC) at school; aim for 'Prize' or 'High Distinction'."),
+            ("Math Olympiad Training", "Enter the Australian Mathematics Competition (AMC) at school; aim for Prize or High Distinction."),
             ("Free Robotic Telescopes", "Create a free account on the Harvard MicroObservatory to control real robotic telescopes online."),
-            ("Google AI Micro-Course", "Complete '
+            ("Google AI Micro-Course", "Complete Google AI for Anyone to understand how data models are built.")
+        ],
+        "🧪 Year 10 (2028) — National Competitions & Research": [
+            ("BHP Science & Engineering Awards", "Use free NASA data to build an astronomy research project (100% free entry)."),
+            ("Citizen Science Contributions", "Join Galaxy Zoo on Zooniverse to help professional astronomers classify deep-space galaxies."),
+            ("Intermediate Olympiad", "Sit the Australian Intermediate Mathematics Olympiad (AIMO) at school."),
+            ("HSC Subject Selection", "Select top-level courses: Physics, Chemistry, Math Advanced, Math Extension 1, and Math Extension 2.")
+        ],
+        "📝 Year 11 (2029) — International Standards": [
+            ("Australian Physics Olympiad (ASO)", "Sit the national exam; aim for a Gold Medal and Australian Science Olympiad Summer School invitation."),
+            ("Free SAT Preparation", "Use Khan Academy's Official SAT Prep daily. Target 1560–1600 total score (perfect 800 Math)."),
+            ("IELTS Academic Test", "Achieve an overall band score of 8.0 or 9.0 (check for fee waivers with school counsellor)."),
+            ("University Physics Outreach", "Email physics professors at local universities (e.g., UQ) for reading materials or mentorship.")
+        ],
+        "🎓 Year 12 (2030) — The Pinnacle": [
+            ("Perfect Australian Rank", "Graduate with an ATAR of 99.50 to 99.95 using study groups and library resources."),
+            ("HSC Top Achiever", "Place on the official NSW Top Achievers list for Physics or Extension Mathematics."),
+            ("Free MIT Application", "Apply to MIT via admissions portal by Nov 1, 2030 (request application fee waiver)."),
+            ("Submit CSS Profile for Financial Aid", "Provide income details so MIT applies full tuition discounts under financial aid policies.")
+        ]
+    }
+    
+    total_tasks = sum(len(items) for items in roadmap.values())
+    completed = sum(1 for v in data["checked"].values() if v)
+    progress = int((completed / total_tasks) * 100) if total_tasks > 0 else 0
+    
+    st.progress(progress / 100)
+    st.write(f"**Overall Progress:** {progress}% ({completed}/{total_tasks} Tasks Completed)")
+    
+    for section, tasks in roadmap.items():
+        with st.expander(section, expanded=True):
+            for title, desc in tasks:
+                is_checked = data["checked"].get(title, False)
+                chk = st.checkbox(f"**{title}**: {desc}", value=is_checked, key=title)
+                if chk != is_checked:
+                    data["checked"][title] = chk
+                    save_data(data)
+                    st.rerun()
+
+# 2. RAI - PERSONAL AI COPILOT
+elif menu == "🤖 Rai - AI Copilot":
+    col_title, col_btn = st.columns([4, 1])
+    with col_title:
+        st.header("🤖 Rai — High-End Personal AI Copilot")
+        st.caption("⚡ Powered by Groq Engine (Ultra Fast & Daily Requests!)")
+    with col_btn:
+        if st.button("🗑️ Clear Memory"):
+            data["chat_history"] = [
+                {"role": "assistant", "content": "Yo bro! 😎 Memory reset complete. What new topic are we exploring today?"}
+            ]
+            save_data(data)
+            st.rerun()
+    
+    if not groq_key:
+        st.warning("⚠️ GROQ_API_KEY environment variable not found in Render settings!")
+    
+    # Display Chat History
+    for msg in data["chat_history"]:
+        avatar = "🤖" if msg["role"] == "assistant" else "🧑‍🚀"
+        with st.chat_message(msg["role"], avatar=avatar):
+            st.markdown(msg["content"])
+            
+    # User Input
+    if user_prompt := st.chat_input("Ask Rai anything (Python, physics, homework, or MIT roadmap!)..."):
+        with st.chat_message("user", avatar="🧑‍🚀"):
+            st.markdown(user_prompt)
+        data["chat_history"].append({"role": "user", "content": user_prompt})
+        
+        system_instruction = (
+            "You are Rai, a high-end personal AI copilot built by a brilliant 14-year-old aspiring MIT astrophysics student. "
+            "You are cool, casual, highly encouraging, and super intelligent. Speak in simple, clear English with emojis. "
+            "You excel at explaining Python coding, solving physics/math problems step-by-step, and giving MIT roadmap advice. "
+            "Never repeat generic boilerplate text; give fully custom, detailed, and direct answers to every prompt."
+        )
+        
+        history_context = ""
+        recent_turns = data["chat_history"][:-1][-10:]
+        for msg in recent_turns:
+            sender = "User" if msg["role"] == "user" else "Rai"
+            history_context += f"{sender}: {msg['content']}\n"
+        
+        response = None
+        
+        if groq_key:
+            try:
+                client = Groq(api_key=groq_key)
+                completion = client.chat.completions.create(
+                    model="llama-3.1-8b-instant",
+                    messages=[
+                        {"role": "system", "content": system_instruction},
+                        {"role": "user", "content": f"Memory context:\n{history_context}\n\nQuestion: {user_prompt}"}
+                    ]
+                )
+                response = completion.choices[0].message.content
+            except Exception as e:
+                response = f"⚠️ **Rai Connection Alert**: Couldn't reach Groq! Check your GROQ_API_KEY in Render settings. (Error: {str(e)})"
+        else:
+            response = "🔑 **Rai System Note**: Please add GROQ_API_KEY in Render Environment Variables to wake up Rai!"
+            
+        with st.chat_message("assistant", avatar="🤖"):
+            st.markdown(response)
+        data["chat_history"].append({"role": "assistant", "content": response})
+        
+        save_data(data)
+        st.rerun()
+
+# 3. LINK & RESOURCE MANAGER
+elif menu == "🔗 Resource & Link Manager":
+    st.header("🔗 Project Links & Resource Vault")
+    st.write("Save websites, GitHub repositories, and space research bookmarks here!")
+    
+    col1, col2 = st.columns([1, 2])
+    with col1:
+        link_title = st.text_input("Link Name (e.g., My Hubble Data Script)")
+        link_url = st.text_input("URL (e.g., https://github.com/...)")
+        if st.button("➕ Add Link"):
+            if link_title and link_url:
+                data["links"].append({"name": link_title, "url": link_url})
+                save_data(data)
+                st.success("Link added!")
+                st.rerun()
+    
+    with col2:
+        st.subheader("Saved Links")
+        for idx, item in enumerate(data["links"]):
+            st.markdown(f"- [**{item['name']}**]({item['url']})")
+
+# 4. VISION & IDEA BOARD
+elif menu == "💡 Space Vision & Idea Board":
+    st.header("💡 Imagine & Design Your Projects")
+    
+    new_idea = st.text_area("Write down project ideas, research questions, or space hypotheses:")
+    if st.button("🚀 Save Idea"):
+        if new_idea:
+            data["ideas"].append(new_idea)
+            save_data(data)
+            st.success("Idea logged into your mission file!")
+            st.rerun()
+            
+    st.subheader("Your Brainstorm Log")
+    for idx, idea in enumerate(data["ideas"]):
+        st.info(f"**Idea #{idx+1}:** {idea}")
    
