@@ -1,8 +1,7 @@
 import streamlit as st
 import json
 import os
-import time
-from google import genai
+from groq import Groq
 
 st.set_page_config(
     page_title="MIT Space Scientist Launchpad",
@@ -13,7 +12,6 @@ st.set_page_config(
 # Deep Space Canvas CSS + Glassmorphic Styling
 st.markdown("""
 <style>
-    /* Deep space background image with dark overlay */
     .stApp {
         background: linear-gradient(rgba(10, 10, 26, 0.88), rgba(10, 10, 26, 0.88)), 
                     url("https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?q=80&w=2000&auto=format&fit=crop");
@@ -60,7 +58,6 @@ st.markdown("""
         text-shadow: 0 0 5px rgba(255, 255, 255, 0.4);
     }
 
-    /* Glass container effect for expanders */
     div[data-testid="stExpander"] {
         background: rgba(20, 24, 45, 0.65);
         border: 1px solid rgba(0, 212, 255, 0.2);
@@ -71,7 +68,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Header Section with Inline Official MIT SVG Logo & Title
+# Header Section
 st.markdown("""
 <div class="header-container">
     <svg class="mit-logo-svg" viewBox="0 0 321 166" xmlns="http://www.w3.org/2000/svg">
@@ -99,14 +96,13 @@ def save_data(data):
 
 data = load_data()
 
-# Ensure chat history key exists
 if "chat_history" not in data:
     data["chat_history"] = [
         {"role": "assistant", "content": "Yo bro! 😎 I'm **Rai**, your personal AI Copilot! I can answer literally anything about Python 🐍, Astrophysics 🌌, Math 🧪, or your MIT Roadmap 🎯. What are we building today?"}
     ]
 
-# Fetch API key automatically from Render Environment
-api_key = os.environ.get("GEMINI_API_KEY")
+# Fetch Groq Key from Render Environment
+groq_key = os.environ.get("GROQ_API_KEY", "")
 
 menu = st.sidebar.radio("Navigation", ["🎯 Roadmap Tracker", "🤖 Rai - AI Copilot", "🔗 Resource & Link Manager", "💡 Space Vision & Idea Board"])
 
@@ -170,7 +166,7 @@ elif menu == "🤖 Rai - AI Copilot":
     col_title, col_btn = st.columns([4, 1])
     with col_title:
         st.header("🤖 Rai — High-End Personal AI Copilot")
-        st.caption("⚡ Powered by Gemini AI | Super Cool, Interactive & Unstoppable Brain!")
+        st.caption("⚡ Powered by Groq Engine (Ultra Fast & 1,000 Free Daily Requests!)")
     with col_btn:
         if st.button("🗑️ Clear Memory"):
             data["chat_history"] = [
@@ -179,8 +175,8 @@ elif menu == "🤖 Rai - AI Copilot":
             save_data(data)
             st.rerun()
     
-    if not api_key:
-        st.warning("⚠️ GEMINI_API_KEY environment variable not found in Render settings!")
+    if not groq_key:
+        st.warning("⚠️ GROQ_API_KEY environment variable not found in Render settings!")
     
     # Display Chat History
     for msg in data["chat_history"]:
@@ -190,56 +186,41 @@ elif menu == "🤖 Rai - AI Copilot":
             
     # User Input
     if user_prompt := st.chat_input("Ask Rai anything (Python, physics, homework, or MIT roadmap!)..."):
-        # Display user message
         with st.chat_message("user", avatar="🧑‍🚀"):
             st.markdown(user_prompt)
         data["chat_history"].append({"role": "user", "content": user_prompt})
         
-        # Real AI Processing with Gemini + Persistent Memory Context
-        if api_key:
-            client = genai.Client(api_key=api_key)
-            system_instruction = (
-                "You are Rai, a high-end personal AI copilot built by a brilliant 14-year-old aspiring MIT astrophysics student. "
-                "You are cool, casual, highly encouraging, and super intelligent. Speak in simple, clear English with emojis. "
-                "You excel at explaining Python coding, solving physics/math problems step-by-step, and giving MIT roadmap advice. "
-                "Never repeat generic boilerplate text; give fully custom, detailed, and direct answers to every prompt."
-            )
-            
-            # Construct context from up to the last 10 historical conversation turns
-            history_context = ""
-            recent_turns = data["chat_history"][:-1][-10:]  # Exclude current prompt, take last 10 messages
-            for msg in recent_turns:
-                sender = "User" if msg["role"] == "user" else "Rai"
-                history_context += f"{sender}: {msg['content']}\n"
-            
-            full_prompt = (
-                f"{system_instruction}\n\n"
-                f"--- CONVERSATION MEMORY ---\n"
-                f"{history_context}"
-                f"--- CURRENT QUESTION ---\n"
-                f"User Question: {user_prompt}"
-            )
-            
-            # Automatic retry loop for temporary 503 capacity spikes
-            response = None
-            max_attempts = 3
-            for attempt in range(max_attempts):
-                try:
-                    response_obj = client.models.generate_content(
-                        model="gemini-3.8-flash",
-                        contents=full_prompt
-                    )
-                    response = response_obj.text
-                    break
-                except Exception as e:
-                    if "503" in str(e) and attempt < max_attempts - 1:
-                        time.sleep(2)
-                        continue
-                    response = f"⚠️ **Rai Connection Alert**: Google servers are experiencing heavy traffic right now. Give it a few seconds and try again! (Error: {str(e)})"
+        system_instruction = (
+            "You are Rai, a high-end personal AI copilot built by a brilliant 14-year-old aspiring MIT astrophysics student. "
+            "You are cool, casual, highly encouraging, and super intelligent. Speak in simple, clear English with emojis. "
+            "You excel at explaining Python coding, solving physics/math problems step-by-step, and giving MIT roadmap advice. "
+            "Never repeat generic boilerplate text; give fully custom, detailed, and direct answers to every prompt."
+        )
+        
+        history_context = ""
+        recent_turns = data["chat_history"][:-1][-10:]
+        for msg in recent_turns:
+            sender = "User" if msg["role"] == "user" else "Rai"
+            history_context += f"{sender}: {msg['content']}\n"
+        
+        response = None
+        
+        if groq_key:
+            try:
+                client = Groq(api_key=groq_key)
+                completion = client.chat.completions.create(
+                    model="llama-3.3-70b-versatile",
+                    messages=[
+                        {"role": "system", "content": system_instruction},
+                        {"role": "user", "content": f"Memory context:\n{history_context}\n\nQuestion: {user_prompt}"}
+                    ]
+                )
+                response = completion.choices[0].message.content
+            except Exception as e:
+                response = f"⚠️ **Rai Connection Alert**: Couldn't reach Groq! Check your GROQ_API_KEY in Render settings. (Error: {str(e)})"
         else:
-            response = "🔑 **Rai System Note**: Please add GEMINI_API_KEY in Render Environment Variables to unlock full AI power! 🔥"
+            response = "🔑 **Rai System Note**: Please add GROQ_API_KEY in Render Environment Variables to wake up Rai!"
             
-        # Display Rai Response
         with st.chat_message("assistant", avatar="🤖"):
             st.markdown(response)
         data["chat_history"].append({"role": "assistant", "content": response})
