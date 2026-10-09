@@ -8,12 +8,12 @@ st.set_page_config(
     layout="wide"
 )
 
-# Deep Space Canvas CSS + Official MIT Emblem Styling
+# Deep Space Canvas CSS + Official MIT Emblem & Custom Card Styling
 st.markdown("""
 <style>
-    /* Deep space background */
+    /* Deep space background image with dark overlay */
     .stApp {
-        background: linear-gradient(rgba(10, 10, 26, 0.85), rgba(10, 10, 26, 0.85)), 
+        background: linear-gradient(rgba(10, 10, 26, 0.88), rgba(10, 10, 26, 0.88)), 
                     url("https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?q=80&w=2000&auto=format&fit=crop");
         background-size: cover;
         background-position: center;
@@ -56,6 +56,15 @@ st.markdown("""
         font-size: 1.1em;
         margin-top: 5px;
         text-shadow: 0 0 5px rgba(255, 255, 255, 0.4);
+    }
+
+    /* Translucent glass container effect for expanders & main blocks */
+    div[data-testid="stExpander"] {
+        background: rgba(20, 24, 45, 0.65);
+        border: 1px solid rgba(0, 212, 255, 0.2);
+        border-radius: 10px;
+        backdrop-filter: blur(5px);
+        margin-bottom: 10px;
     }
 </style>
 """, unsafe_allow_html=True)
