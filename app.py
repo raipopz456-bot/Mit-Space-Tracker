@@ -1,7 +1,8 @@
-import streamlit as st
+
+            import streamlit as st
 import json
 import os
-import random
+from google import genai
 
 st.set_page_config(
     page_title="MIT Space Scientist Launchpad",
@@ -101,10 +102,12 @@ data = load_data()
 # Ensure chat history key exists
 if "chat_history" not in data:
     data["chat_history"] = [
-        {"role": "assistant", "content": "Greetings Commander! 🤖 I am **Rai**, your personal high-end AI Copilot. I'm calibrated to assist with Python coding 🐍, astrophysics calculations 🌌, and tracking your MIT roadmap 🎯. What are we launching today?"}
+        {"role": "assistant", "content": "Yo bro! 😎 I'm **Rai**, your personal AI Copilot! I can answer literally anything about Python 🐍, Astrophysics 🌌, Math 🧪, or your MIT Roadmap 🎯. What are we building today?"}
     ]
 
-# Sidebar Navigation
+# Fetch API key automatically from Render Environment
+api_key = os.environ.get("GEMINI_API_KEY")
+
 menu = st.sidebar.radio("Navigation", ["🎯 Roadmap Tracker", "🤖 Rai - AI Copilot", "🔗 Resource & Link Manager", "💡 Space Vision & Idea Board"])
 
 # 1. ROADMAP TRACKER
@@ -165,7 +168,10 @@ if menu == "🎯 Roadmap Tracker":
 # 2. RAI - PERSONAL AI COPILOT
 elif menu == "🤖 Rai - AI Copilot":
     st.header("🤖 Rai — High-End Personal AI Copilot")
-    st.caption("⚡ Powered by Custom Mission Intelligence | Ready to compute, code & guide!")
+    st.caption("⚡ Powered by Gemini AI | Super Cool, Interactive & Unstoppable Brain!")
+    
+    if not api_key:
+        st.warning("⚠️ GEMINI_API_KEY environment variable not found in Render settings!")
     
     # Display Chat History
     for msg in data["chat_history"]:
@@ -174,30 +180,33 @@ elif menu == "🤖 Rai - AI Copilot":
             st.markdown(msg["content"])
             
     # User Input
-    if user_prompt := st.chat_input("Ask Rai anything about Python, Astrophysics, or your MIT Roadmap..."):
+    if user_prompt := st.chat_input("Ask Rai anything (Python, physics, homework, or MIT roadmap!)..."):
         # Display user message
         with st.chat_message("user", avatar="🧑‍🚀"):
             st.markdown(user_prompt)
         data["chat_history"].append({"role": "user", "content": user_prompt})
         
-        # Rai Intelligence Engine Logic
-        query = user_prompt.lower()
-        
-        if "python" in query or "code" in query or "coding" in query:
-            response = "🐍 **Rai's Python Protocol**: Python is the absolute #1 language at MIT and NASA! Start with variables, `for` loops, and `functions`. When you're ready, we'll write scripts using `matplotlib` and `astropy` to plot real cosmic data! 📊✨"
-        elif "mit" in query or "target" in query or "roadmap" in query or "goal" in query:
-            response = "🎯 **Rai's Mission Analysis**: Our 4-Year Target to MIT is locked in! Key milestones right now: Master Advanced Algebra on Khan Academy, start foundational Python, and study Hubble coordinates. We are building the ultimate application portfolio step-by-step! 🚀🏆"
-        elif "space" in query or "physics" in query or "astronomy" in query or "star" in query:
-            response = "🌌 **Rai's Astrophysics Core**: Space science is pure physics + data engineering! From orbital mechanics ($v = \\sqrt{GM/r}$) to galaxy spectrum analysis, coding lets us peer into deep space! Keep pushing! ☄️🔭"
-        elif "hello" in query or "hi" in query or "rai" in query:
-            response = "⚡ **Rai Online**: Hey Commander! Systems are nominal and all telemetry is green 🟢. What project or study target are we conquering today? 🚀"
+        # Real AI Processing with Gemini
+        if api_key:
+            try:
+                client = genai.Client(api_key=api_key)
+                
+                system_instruction = (
+                    "You are Rai, a high-end personal AI copilot built by a brilliant 14-year-old aspiring MIT astrophysics student. "
+                    "You are cool, casual, highly encouraging, and super intelligent. Speak in simple, clear English with emojis. "
+                    "You excel at explaining Python coding, solving physics/math problems step-by-step, and giving MIT roadmap advice. "
+                    "Never repeat generic boilerplate text; give fully custom, detailed, and direct answers to every prompt."
+                )
+                
+                response_obj = client.models.generate_content(
+                    model="gemini-2.5-flash",
+                    contents=f"{system_instruction}\n\nUser Question: {user_prompt}"
+                )
+                response = response_obj.text
+            except Exception as e:
+                response = f"⚠️ **Rai Connection Alert**: Couldn't reach my AI brain! Double-check your API key in Render settings. (Error: {str(e)})"
         else:
-            options = [
-                "🚀 **Rai System Output**: Copy that! Every line of code and every math problem solved brings us one step closer to MIT. Let's keep making moves! 💥",
-                "🛸 **Rai Protocol**: Roger that Commander! I'm logging this query in your central database. Ready for the next directive! ⚡",
-                "🧪 **Rai Intelligence**: Excellent thinking! Keep building your skills in Python, physics, and advanced math—the stars are waiting! 🌌✨"
-            ]
-            response = random.choice(options)
+            response = "🔑 **Rai System Note**: Please add GEMINI_API_KEY in Render Environment Variables to unlock full AI power! 🔥"
             
         # Display Rai Response
         with st.chat_message("assistant", avatar="🤖"):
