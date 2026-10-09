@@ -209,7 +209,7 @@ elif menu == "🤖 Rai - AI Copilot":
             try:
                 client = Groq(api_key=groq_key)
                 completion = client.chat.completions.create(
-                    model="llama-3.1-8b-instant",
+                    model="llama3-8b-8192",
                     messages=[
                         {"role": "system", "content": system_instruction},
                         {"role": "user", "content": f"Memory context:\n{history_context}\n\nQuestion: {user_prompt}"}
