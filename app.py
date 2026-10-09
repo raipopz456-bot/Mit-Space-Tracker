@@ -251,3 +251,4 @@ elif menu == "💡 Space Vision & Idea Board":
     st.subheader("Your Brainstorm Log")
     for idx, idea in enumerate(data["ideas"]):
         st.info(f"**Idea #{idx+1}:** {idea}")
+        
