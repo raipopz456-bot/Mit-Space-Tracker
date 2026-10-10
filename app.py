@@ -9,6 +9,13 @@ st.set_page_config(
     layout="wide"
 )
 
+# Fetch Password from Render Environment Variables (Default fallback: "mit2030")
+CORRECT_PASSWORD = os.environ.get("APP_PASSWORD", "mit2030")
+
+# Session state initialization for authentication
+if "authenticated" not in st.session_state:
+    st.session_state.authenticated = False
+
 # Deep Space Canvas CSS + Glassmorphic Styling
 st.markdown("""
 <style>
@@ -68,6 +75,38 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+# ---------------------------------------------------------
+# SECURITY GATEKEEPER PAGE
+# ---------------------------------------------------------
+if not st.session_state.authenticated:
+    st.markdown("""
+    <div class="header-container">
+        <svg class="mit-logo-svg" viewBox="0 0 321 166" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0 166V0h33v166H0zm55 0V0h33v110H55v56zm55 0V0h33v166h-33zm55 0V56h33v110h-33zm0-110V0h33v56h-33zm55 110V0h33v166h-33zm56 0V56h32v110h-32z" fill="#A31F34"/>
+        </svg>
+        <h1 class="main-title">MISSION CONTROL SECURITY GATE</h1>
+        <div class="sub-title">🔒 Authorized Access Only — Enter Mission Passcode</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        st.write("")
+        st.write("")
+        user_input = st.text_input("🔑 Passcode Required:", type="password", key="passcode_input")
+        if st.button("🚀 Unlock Launchpad", use_container_width=True):
+            if user_input == CORRECT_PASSWORD:
+                st.session_state.authenticated = True
+                st.success("Access Granted! Launching Mission Control...")
+                st.rerun()
+            else:
+                st.error("⛔ Access Denied: Incorrect Passcode")
+    st.stop()  # Stop executing the rest of the script until logged in
+
+# ---------------------------------------------------------
+# MAIN APPLICATION (UNLOCKED)
+# ---------------------------------------------------------
+
 # Header Section
 st.markdown("""
 <div class="header-container">
@@ -103,6 +142,12 @@ if "chat_history" not in data:
 
 # Fetch Groq Key from Render Environment
 groq_key = os.environ.get("GROQ_API_KEY", "")
+
+# Sidebar setup with Lock option
+st.sidebar.markdown("### 👨‍🚀 Commander Dashboard")
+if st.sidebar.button("🔒 Lock Launchpad"):
+    st.session_state.authenticated = False
+    st.rerun()
 
 menu = st.sidebar.radio("Navigation", ["🎯 Roadmap Tracker", "🤖 Rai - AI Copilot", "🔗 Resource & Link Manager", "💡 Space Vision & Idea Board"])
 
