@@ -199,8 +199,11 @@ if menu == "🎯 Roadmap Tracker":
     for section, tasks in roadmap.items():
         with st.expander(section, expanded=True):
             for title, desc in tasks:
+                # Retrieve existing check state from JSON data file
                 is_checked = data["checked"].get(title, False)
-                chk = st.checkbox(f"**{title}**: {desc}", value=is_checked, key=title)
+                
+                # Checkbox updates state and saves to JSON file immediately on change
+                chk = st.checkbox(f"**{title}**: {desc}", value=is_checked, key=f"chk_{title}")
                 if chk != is_checked:
                     data["checked"][title] = chk
                     save_data(data)
